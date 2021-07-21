@@ -1,0 +1,53 @@
+﻿<Window x:Name="Win" x:Class="MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:imageRanger"
+        mc:Ignorable="d"
+        Title="image Ranger"
+        Height="600" Width="1000"
+        Background="{Binding ElementName=Win, Path=BackgroundBrush}" FontFamily="DejaVu Sans Mono for Powerline" FontSize="12">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" MinWidth="120" />
+            <ColumnDefinition Width="3*" MinWidth="50" />
+            <ColumnDefinition Width="5*" MinWidth="50" />
+        </Grid.ColumnDefinitions>
+        <Rectangle VerticalAlignment="Bottom" Grid.ColumnSpan="3" Height="1" Fill="{Binding ElementName=Win, Path=LineBrush}" />
+        <Rectangle Grid.Row="1" VerticalAlignment="Bottom" Grid.ColumnSpan="3" Height="1" Fill="{Binding ElementName=Win, Path=LineBrush}" />
+        <Rectangle Grid.Column="0" Width="1" HorizontalAlignment="Right" Fill="{Binding ElementName=Win, Path=LineBrush}" Grid.Row="1" />
+        <Rectangle Grid.Column="1" Width="1" HorizontalAlignment="Right" Fill="{Binding ElementName=Win, Path=LineBrush}" Grid.Row="1" />
+
+        <GridSplitter Grid.Row="1" Width="5" Margin="0 0 -2 0" BorderThickness="0" Background="Transparent" />
+
+        <TextBlock Grid.ColumnSpan="3" VerticalAlignment="Center" Margin="4 0" FontWeight="Bold">
+            <Run Foreground="{Binding ElementName=Win, Path=MashineDataBrush}" Text="{Binding ElementName=Win, Path=MashineData}" /><!--
+         --><Run Foreground="{Binding ElementName=Win, Path=CurrentPathBrush}" Text="{Binding ElementName=Win, Path=CurrentPath}" /><!--
+         --><Run Foreground="{Binding ElementName=Win, Path=CurrentEntryBrush}" Text="{Binding ElementName=Win, Path=CurrentEntryName}" />
+        </TextBlock>
+
+        <ScrollViewer Grid.Column="1" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Hidden">
+            <ItemsControl x:Name="MiddleList" DataContext="{Binding ElementName=Win, Path=Entries}" ItemsSource="{Binding}" VerticalAlignment="Top">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="local:Entry">
+                        <Grid Background="{Binding BgColor}">
+                            <ContentControl Content="{Binding DisplayName}" Foreground="{Binding Color}" Background="{Binding BgColor}" HorizontalAlignment="Left" />
+                            <ContentControl Content="{Binding DisplayInfo}" Foreground="{Binding Color}" Background="{Binding BgColor}" HorizontalAlignment="Right" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+    </Grid>
+</Window>

@@ -1,5 +1,7 @@
 ﻿Public Class Entry
 
+    Public Event SelectedChenged(ByVal sender As Object, ByVal e As EventArgs)
+
     Public Property Color() As Brush
         Get
             If Selected Then
@@ -48,12 +50,25 @@
         End Set
     End Property
 
+    Public Property Control As EntryControl
     Public Property IsDir As Boolean = False
     Public Property IsLink As Boolean = False
     Public Property IsMissingLink As Boolean = False
     Public Property IsExe As Boolean = False
-    Public Property Selected As Boolean = False
     Public Property Index As Integer = -1
+
+    Private _Selected As Boolean = False
+    Public Property Selected As Boolean
+        Get
+            Return _Selected
+        End Get
+        Set(value As Boolean)
+            If value <> _Selected Then
+                _Selected = value
+                RaiseEvent SelectedChenged(Me, New EventArgs)
+            End If
+        End Set
+    End Property
 
     Public ReadOnly Property Order As String
         Get
@@ -65,10 +80,12 @@
         End Get
     End Property
 
-    Private FileInfo As IO.FileInfo
-    Private DirInfo As IO.DirectoryInfo
-    Private LnkInfo As LnkReader.Lnk
-    Private Attributes As FileAttribute
+    Friend FileInfo As IO.FileInfo
+    Friend DirInfo As IO.DirectoryInfo
+    Friend LnkInfo As LnkReader.Lnk
+    Friend LinkLocation As IO.FileInfo
+    Friend Attributes As FileAttribute
+    Private isEmpty As Boolean = False
 
     Public Property ChildEntries As Entry() = {}
     Public Property Parent As Entry
@@ -97,6 +114,17 @@
         End Set
     End Property
 
+    Public Property Path() As String
+        Get
+            If IsDir Then
+                Return "" & DirInfo?.FullName
+            End If
+            Return "" & FileInfo?.FullName
+        End Get
+        Set(ByVal value As String)
+        End Set
+    End Property
+
     Public Property EntryInfos As String
         Get
             If IsDir Then
@@ -110,7 +138,11 @@
     End Property
 
     Private Function FileSizeStr() As String
-        Dim size As Double = FileInfo.Length
+        Dim size As Double
+        If FileInfo.Exists Then
+            size = FileInfo.Length
+        End If
+
         Dim Unit As String = "B"
 
         If size > 1000 Then
@@ -166,6 +198,7 @@
         If FI.Extension = ".lnk" Then
             LnkInfo = LnkReader.Lnk.OpenLnk(FI.FullName)
             IsLink = True
+            LinkLocation = FI
             If IO.File.Exists(LnkInfo.BasePath) Or IO.Directory.Exists(LnkInfo.BasePath) Then
                 Attributes = IO.File.GetAttributes(LnkInfo.BasePath)
                 If (Attributes & FileAttribute.Directory) = FileAttribute.Directory Then
@@ -187,10 +220,58 @@
         End If
     End Sub
 
+    <DebuggerHidden>
     Public Sub New(DI As IO.DirectoryInfo)
         IsDir = True
         DirInfo = DI
         Attributes = IO.File.GetAttributes(DI.FullName)
     End Sub
+
+    <DebuggerHidden>
+    Public Sub New()
+        IsDir = True
+        DirInfo = Nothing
+        isEmpty = True
+    End Sub
+
+    <DebuggerHidden>
+    Public Overrides Function ToString() As String
+        Dim str As String = ""
+        If IsDir Then
+            str = "DIR "
+        End If
+        str &= DisplayName
+        If IsLink Then
+            str &= " ->"
+        End If
+        Return str
+    End Function
+
+    <DebuggerHidden>
+    Public Function IsPath(path As String) As Boolean
+        If isEmpty Then Return False
+        Dim A As String = IO.Path.GetFullPath(path)
+        Dim B As String = IO.Path.GetFullPath(Me.Path)
+        If Configuration.IgnoreCaseInPath Then
+            A = A.ToLower
+            B = B.ToLower
+        End If
+        Return A.Equals(B)
+    End Function
+
+    Public Function CreateParent() As Entry
+        If Parent IsNot Nothing Then Return Parent
+        Dim Path As String
+        If IsLink Then
+            Path = LinkLocation.Directory.Parent.FullName
+        ElseIf IsDir Then
+            If DirInfo?.Parent Is Nothing Then Return Nothing
+            Path = DirInfo.Parent.FullName
+        Else
+            Path = FileInfo.Directory.Parent.FullName
+        End If
+        Parent = New Entry(New IO.DirectoryInfo(Path))
+        Return Parent
+    End Function
 
 End Class

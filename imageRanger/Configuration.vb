@@ -63,4 +63,40 @@
         End Set
     End Property
 
+    <Newtonsoft.Json.JsonProperty("IgnoreCaseInPath")>
+    Private _IgnoreCaseInPath As Boolean = True
+    <Newtonsoft.Json.JsonIgnore>
+    Public Shared Property IgnoreCaseInPath() As Boolean
+        Get
+            Return MySelf._IgnoreCaseInPath
+        End Get
+        Set(ByVal value As Boolean)
+            MySelf._IgnoreCaseInPath = value
+        End Set
+    End Property
+
+    <Newtonsoft.Json.JsonProperty("BinaryFiles")>
+    Private _BinaryFiles As String() = {".BIN", ".ZIP", ".7Z", ".RAR"}
+    <Newtonsoft.Json.JsonIgnore>
+    Public Shared Property BinaryFiles() As String()
+        Get
+            Return MySelf._BinaryFiles.Select(Function(s) s.ToUpper).ToArray
+        End Get
+        Set(ByVal value As String())
+            MySelf._BinaryFiles = value
+        End Set
+    End Property
+
+    <Newtonsoft.Json.JsonProperty("ForcedTextFiles")>
+    Private _ForcedTextFiles As String() = {}
+    <Newtonsoft.Json.JsonIgnore>
+    Public Shared Property ForcedTextFiles() As String()
+        Get
+            Return MySelf._ForcedTextFiles.Select(Function(s) s.ToUpper).ToArray
+        End Get
+        Set(ByVal value As String())
+            MySelf._ForcedTextFiles = value
+        End Set
+    End Property
+
 End Class

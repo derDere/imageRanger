@@ -77,7 +77,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Configuration.vb" />
+    <Compile Include="EntryControl.xaml.vb">
+      <DependentUpon>EntryControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Theme.vb" />
+    <Page Include="EntryControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
